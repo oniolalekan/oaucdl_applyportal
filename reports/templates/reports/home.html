@@ -1,0 +1,10 @@
+{% extends "apply/base.html" %}
+{% block content %}
+    <h2>Congratulations you have completed the payment</h2>
+    <div class="border-top pt-3">
+        {{request.session.customer_identity}}
+        <small class="text-muted">
+            <a class="ml-2" href="{% url 'login' %}">Click Here to Print Admission Letter</a>
+        </small>
+    </div>
+{% endblock content %}

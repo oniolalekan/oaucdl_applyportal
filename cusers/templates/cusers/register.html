@@ -1,0 +1,47 @@
+{% extends "apply/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST" id="registerForm" data-locals-url="{% url 'load_locals' %}" novalidate>
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Join Today</legend>
+                {{ form|crispy}}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Sign Up</button>
+            </div>
+        </form>
+        <div class="border-top pt-3">
+            <small class="text-muted">
+                Already Have An Account? <a class="ml-2" href="{% url 'login' %}">Sign In</a>
+            </small>
+        </div>
+    </div>
+
+     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+            $("#id_state").change(function () {
+            var url = $("#registerForm").attr("data-locals-url");  // get the url of the `load_locals` view
+            var stateId = $(this).val();  // get the selected state ID from the HTML input
+
+            $.ajax({                       // initialize an AJAX request
+                url: url,                    // set the url of the request (= localhost:8000/profile/load-cities/)
+                data: {
+                'state': stateId       // add the country id to the GET parameters
+                },
+                success: function (data) {   // `data` is the return of the `load_locals` view function
+                $("#id_local_government_area").html(data);  // replace the contents of the state input with the data that came from the server
+                }
+            });
+
+            });
+
+            $(function () {
+            $("#id_birth_date").datepicker({
+                format: 'd/m/Y',
+            });
+            });
+  </script>
+
+{% endblock content %}

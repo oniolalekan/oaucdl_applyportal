@@ -1,0 +1,106 @@
+{% extends "apply/base.html" %}
+{% block content %}
+
+
+
+<div class="content-section">
+
+    
+
+    <div class="media">
+        <img class="rounded account-img" src="{{ user.userprofile.image.url }}">
+        <div class="media-body">
+          <h2 class="account-heading">{{ user.last_name}} {{user.first_name }}</h2>
+          <h3 class="text-secondary">Application Number: {{ user.programme_session.description  }}</h3>
+        </div>
+    </div>
+    
+        
+
+    <form onsubmit="makePayment()" id="payment-form">
+        
+        <ul class="list-group">
+            <li class="list-group-item list-group-item-light">
+                <label>Full Name </label>
+                <input type="text" id="js-firstName" name="firstName" class="field-divided" placeholder="First" readonly/>&nbsp;
+                <input type="text" id="js-lastName" name="lastName" class="field-divided" placeholder="Last" readonly/>
+            </li>
+            <li class="list-group-item list-group-item-light">
+                <label>Email </label>
+                <input type="email" id="js-email" name="email" class="field-long" readonly/>
+            </li>
+            <li class="list-group-item list-group-item-light">
+                <label>Narration </label>
+                <input type="text" id="js-narration" name="narration" class="field-long" readonly/>
+            </li>
+            <li class="list-group-item list-group-item-light">
+                <label>Amount <span class="required"></span></label>
+                
+                <input type="number" id="js-amount" name="amount" class="field-long" readonly/>
+            </li>
+            <li class="list-group-item list-group-item-light">
+                <input type="button" onclick="makePayment()" value="Pay Now"/>
+            </li>
+        </ul>
+    </form>
+
+</div>
+    <script>
+
+    function setDemoData() {
+        var obj = {
+            firstName: "{{payment.first_name }}",
+            lastName: "{{payment.last_name}}",
+            email: "{{ payment.email}}",
+            narration: "Application Fee",
+            amount: 4000
+        };
+        for (var propName in obj) {
+            document.querySelector('#js-' + propName).setAttribute('value', obj[propName]);
+        }
+    }
+
+    
+
+    function makePayment() {
+        var form = document.querySelector("#payment-form");
+        
+        var paymentEngine = RmPaymentEngine.init({
+            key: "RzAwMDAxNjU0NDB8NDE5NzkyMDV8NjVkMzgzMDlmZjZhZWM3MTZhOGE5YmI5OGJlNWNhYzBkZDE2ZWNkZmJlN2FlZjg2MTlkNTA3Mjc2YmNhZTM1MGZiZTIxMzY3MjhhY2FiMTUxMGE0OTk1MDZhOWZjNzhhMGMxNmI1MDBhOWE5N2E0MWQyNDE0NGMzMjkwOTQyZjQ=",
+            customerId: form.querySelector('input[name="email"]').value,
+            firstName: form.querySelector('input[name="firstName"]').value,
+            lastName: form.querySelector('input[name="lastName"]').value,
+            email: form.querySelector('input[name="email"]').value,
+            narration: form.querySelector('input[name="narration"]').value,
+            amount: form.querySelector('input[name="amount"]').value,
+            onSuccess: function (response) {
+                var url = "{% url 'report-paid' %}";                
+                params = "paymentReference="+response['paymentReference']+"&"+"transactionId="+response['transactionId']+"&"+"message="+response["message"]+"&"+"processorId="+response["processorId"]+"&"+"amount="+response["amount"];
+                window.location = url + "?" + params;
+            },
+            onError: function (response) {
+                alert(response)
+                console.log('callback Error Response', response);
+
+            },
+            onClose: function () {
+                console.log("closed");
+            }
+        });
+        
+        paymentEngine.showPaymentWidget();
+
+        
+    }
+
+    window.onload = function () {
+        setDemoData();
+    }; 
+
+    
+    
+</script>
+    
+    <script type="text/javascript" src="https://remitademo.net/payment/v1/remita-pay-inline.bundle.js"></script>
+    
+{% endblock content %}
